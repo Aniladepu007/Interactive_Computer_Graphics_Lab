@@ -1,6 +1,4 @@
-
 package my_main;
-
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -10,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+//import java.util.concurrent.TimeUnit;
 //import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.Font;
@@ -53,16 +52,14 @@ public class game_panel extends JPanel implements Runnable {
 		
 	//constructor
 	public game_panel() {
-	
 		init();
-
 	}
 
 public void init() {
 	mousex = 0;
 	theBall = new Ball();
 	thePaddle = new Paddle(120,12);
-	theMap = new Map(8,9);
+	theMap = new Map(8,10);
 	theHud = new HUD();
 	theMouseListener = new MyMouseMotionListener();
 	powerUps = new ArrayList<PowerUp>();
@@ -77,23 +74,28 @@ public void init() {
 	
 	g =  (Graphics2D) image.getGraphics();
 	g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	
+
+//	try {
+//		TimeUnit.SECONDS.sleep(10);
+//	}
+//	catch (Exception e) {
+//		e.printStackTrace();
+//	}
 }
 
-	@Override
+	
 	public void run() {
+		try {
+				Thread.sleep(500);
+		}
+		catch (Exception e) {
+				e.printStackTrace();
+		}
+
 		// this is the main game loop called by the thread in game_main class over and over
 		//Game loop
-		
-	try {
-			Thread.sleep(500);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	
-		while(running == true) {		
+		while(running == true) {
 			//Thread ThreadObj1 = new Thread();
-				
 			//update
 			update();
 			
@@ -105,9 +107,10 @@ public void init() {
 			
 			try {
 				Thread.sleep(12);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				e.printStackTrace();
-			  }
+			}
 		}
 	}
 
@@ -177,8 +180,11 @@ public void init() {
 						if(theMap.getMapArray()[row][col] ==1 ) {
 							ScreenShakeActive = true;
 							screenShakeTimer = System.nanoTime();
-							//playSound("file:./resources/brick_break.wav",0);
+							playSound("file:./resources/brick_break.wav",0);
 							playSound("file:./resources/fasak.wav",0);
+						}
+						else if(theMap.getMapArray()[row][col] <=3) {
+							playSound("file:./resources/brick_break.wav",0);
 						}
 					
 						if(theMap.getMapArray()[row][col] > 3 ) {
@@ -208,56 +214,10 @@ public void init() {
 	}
  }
 	
-public void update() {
-
-	//synchronized(this) {
-	//checkCollisions();
-	//theBall.update();
-	//thePaddle.update();
-	
-	Thread t1 = new Thread(new Runnable( ) {
-		@Override
-		public void run() {
-			
-			synchronized(this) {
-				checkCollisions();
-			}
-		}
-	});
-	Thread t2 = new Thread(new Runnable( ) {
-		@Override
-		public void run() {
-			synchronized(theBall) {
-				theBall.update();
-			}	
-		}
-	});
-	t1.start();
-	//	t1.setPriority(5);
-	try {
-		t1.join();
-	} catch(Exception e) {
-		e.printStackTrace();
-	}
-	
-	Thread t3 = new Thread(new Runnable( ) {
-		@Override
-		public void run() {
-			synchronized(thePaddle) {
-				thePaddle.update();
-			}
-		}
-	});
-	t2.start();
-	t3.start();	
-	try {
-		//t1.join();
-		t2.join();
-		t3.join();
-	} catch(Exception e) {
-		e.printStackTrace();
-	}
-	
+public void update() {	
+	checkCollisions();
+	theBall.update();
+	thePaddle.update();	
 	for(PowerUp pu : powerUps) {
 		pu.update();
 	}
@@ -266,112 +226,35 @@ public void update() {
 		ScreenShakeActive = false;
 	}
 
-	//}
-	}
+}
 	
 private void draw() {
 	// draws the background of the image in g object 
 	g.setColor(Color.BLACK);
 	
 	g.fillRect(0, 0, game_main.WIDTH, game_main.HEIGHT);
-
-	/*theBall.draw(g);
+	theBall.draw(g);
 	thePaddle.draw(g);
 	theMap.draw(g);
 	theHud.draw(g);
-	drawPowerUps();*/
+	drawPowerUps();
 	
-	
-	Thread t4 = new Thread(new Runnable( ) {
-		@Override
-		public void run() {
-			synchronized(theBall) {
-				theBall.draw(g);
-			}
-		}
-	});
-	
-	Thread t5 = new Thread(new Runnable( ) {
-		@Override
-		public void run() {
-			synchronized(thePaddle) {
-				thePaddle.draw(g);
-			}
-		}
-	});
-	
-	Thread t6 = new Thread(new Runnable( ) {
-		@Override
-		public void run() {
-			synchronized(theMap) {
-				theMap.draw(g);
-			}
-		}
-	});
-	
-	Thread t7 = new Thread(new Runnable( ) {
-		@Override
-		public void run() {
-			synchronized(theHud) {
-				theHud.draw(g);
-			}
-		}
-	});
-	
-	Thread t8 = new Thread(new Runnable( ) {
-		@Override
-		public void run() {
-			synchronized(this) {
-				drawPowerUps();
-			}	
-		}
-	});
-	
-	t4.start();
-	try {
-		t4.join();
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-
-	t5.start();
-	try {
-		t5.join();
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-
-	t6.start();
-	try {
-		t6.join();
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-
-	t7.start();
-	try {
-		t7.join();
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-	
-	t8.start();	
-	try {
-		t8.join();
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
 	if(theMap.checkWin() == true) {
-		printWin();
 		running = false;
+		printWin();
+		//init();
+		//running = true;
 	}	
 
 	if(theBall.YouLose() == true) {
 		running = false;
 		printLose();
+		//running = true;
+		//init();
 	}
-}
 
+}
+	
 	private void printWin() {
 		g.setColor(Color.ORANGE);
 		g.setFont(new Font("Courier New",Font.BOLD,30));
@@ -389,8 +272,6 @@ private void draw() {
 			pu.draw(g);
 		}
 	}
-
-	
 	
 	//paintComponent is an inbuilt fn. which is overridden here
 	public synchronized void paintComponent(Graphics g) {

@@ -93,10 +93,8 @@ public class Ball {
 
 	public boolean YouLose() {
 		boolean loser = false;
-		
 		if(y > game_main.HEIGHT - 50)
 			loser = true;
-
 	   return loser;
 	}
 

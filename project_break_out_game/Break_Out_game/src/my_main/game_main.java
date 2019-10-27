@@ -6,11 +6,16 @@ import javax.swing.JFrame;
 
 public class game_main {
 	
-	public static final int WIDTH = 800 , HEIGHT = 560;
+	public static final int WIDTH = 840 , HEIGHT = 560;
 	
 	public static void main( String[] args ) {
-		
+		runner();
+	}
+
+	public static void runner() {
 		JFrame theFrame =  new JFrame("ARCADE'S _FASAK_BREAK_OUT_GAME_");
+
+		//		Jframe.add();
 
 		game_panel PanelObj = new game_panel();
 		
@@ -24,6 +29,7 @@ public class game_main {
 		ThreadObj.start();
 		
 		theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		theFrame.setVisible(true);		
+		theFrame.setVisible(true);
 	}
+
 }
